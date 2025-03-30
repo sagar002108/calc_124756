@@ -62,7 +62,7 @@ class CalcParser(Parser):
         return p.NUMBER
 
 # Streamlit UI
-st.title("🧮 Streamlit Calculator")
+st.title("🧮 Simple Calculator")
 expression = st.text_input("Enter expression:")
 
 if st.button("Calculate"):
