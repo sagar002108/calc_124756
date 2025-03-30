@@ -124,7 +124,7 @@ class CalcParser(Parser):
             return "Error: Invalid Input"
 
 # Streamlit UI
-st.title("🧮 Streamlit Multi-Mode Calculator")
+st.title("🧮  Multi-Mode Calculator")
 
 # Dropdown to select mode
 calc_mode = st.selectbox("Select Calculation Mode", ["Simple Calculator", "Infix Notation", "Prefix Notation", "Postfix Notation"])
