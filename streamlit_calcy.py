@@ -104,6 +104,48 @@ class CalcParser(Parser):
                     stack.append(a / b if b != 0 else "Error: Division by zero")
         return stack[0] if stack else "Error: Invalid Expression"
 
+# Custom CSS for setting a background image
+st.markdown(
+    """
+    <style>
+        body {
+            background-image: url("https://source.unsplash.com/1600x900/?abstract,technology"); /* Change this to your preferred image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+        }
+        .stTextInput, .stButton, .stTextArea {
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .stButton>button {
+            background: #ff7e5f;
+            color: white;
+            font-size: 18px;
+            border-radius: 10px;
+            padding: 10px 20px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .stButton>button:hover {
+            background: #feb47b;
+        }
+        .stSuccess {
+            color: #34eb8c;
+            font-weight: bold;
+        }
+        .stError {
+            color: #ff4c4c;
+            font-weight: bold;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Streamlit UI
 st.title(" PPI Calculator")
