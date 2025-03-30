@@ -105,7 +105,7 @@ class CalcParser(Parser):
         return stack[0] if stack else "Error: Invalid Expression"
 
 # Streamlit UI
-st.title("🧮 Prefix,Postfix,Infix Calculator")
+st.title("🧮 PPI Calculator")
 expression = st.text_input("Enter expression:")
 
 if st.button("Calculate"):
