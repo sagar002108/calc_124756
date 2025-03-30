@@ -104,28 +104,69 @@ class CalcParser(Parser):
                     stack.append(a / b if b != 0 else "Error: Division by zero")
         return stack[0] if stack else "Error: Invalid Expression"
 
-# Streamlit UI
-st.title("🧮 PPI Calculator")
-expression = st.text_input("Enter expression:")
+# Custom CSS for a colorful theme
+st.markdown(
+    """
+    <style>
+        body {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .stTextInput, .stButton, .stTextArea {
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #ffffff;
+            color: black;
+            box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.2);
+        }
+        .stButton>button {
+            background: #ff7e5f;
+            color: white;
+            font-size: 18px;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+        .stButton>button:hover {
+            background: #feb47b;
+        }
+        .stSuccess {
+            color: #34eb8c;
+            font-weight: bold;
+        }
+        .stError {
+            color: #ff4c4c;
+            font-weight: bold;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-if st.button("Calculate"):
+# Streamlit UI
+st.title("🎨 Creative Streamlit Calculator")
+
+expression = st.text_input("📝 Enter Expression:", placeholder="Type your math expression here...")
+
+if st.button("🧮 Calculate"):
     lexer = CalcLexer()
     parser = CalcParser()
-
+    
     try:
-        # Check if expression is in postfix notation (contains no operators like '+', '-', etc. between numbers)
         if ' ' in expression:
-            if expression.strip().startswith(('+', '-', '*', '/')):  # Check if it starts with operator (prefix)
-                result = parser.parse_prefix(expression)  # Process prefix expression
-                st.success(f"Prefix Result: {result}")
+            if expression.strip().startswith(('+', '-', '*', '/')):
+                result = parser.parse_prefix(expression)
+                st.success(f"✅ Prefix Result: {result}")
             else:
-                result = parser.parse_postfix(expression)  # Process postfix expression
-                st.success(f"Postfix Result: {result}")
+                result = parser.parse_postfix(expression)
+                st.success(f"✅ Postfix Result: {result}")
         else:
-            tokens = iter(lexer.tokenize(expression))  # Convert list to iterator for infix evaluation
-            result = parser.parse(tokens)  # Process infix expression
-            st.success(f"Infix Result: {result}")
+            tokens = iter(lexer.tokenize(expression))
+            result = parser.parse(tokens)
+            st.success(f"✅ Infix Result: {result}")
     except Exception as e:
+        st.error(f"❌ Error: {e}")
         st.error(f"Error: {e}")
 
 
