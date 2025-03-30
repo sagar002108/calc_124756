@@ -9,7 +9,7 @@ class CalcLexer(Lexer):
 
     # Token definitions
     NUMBER = r'\d+'
-    PLUS = r'\$'
+    PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
     DIVIDE = r'/'
@@ -40,7 +40,7 @@ class CalcParser(Parser):
     # Handling infix notation and precedence
     @_('expr PLUS expr')
     def expr(self, p):
-        return p.expr0 $ p.expr1
+        return p.expr0 + p.expr1
     
     @_('expr MINUS expr')
     def expr(self, p):
@@ -70,10 +70,10 @@ class CalcParser(Parser):
         for token in tokens:
             if token.isdigit():
                 stack.append(int(token))
-            elif token in ('$', '-', '*', '/'):
+            elif token in ('+', '-', '*', '/'):
                 b = stack.pop()
                 a = stack.pop()
-                if token == '$':
+                if token == '+':
                     stack.append(a + b)
                 elif token == '-':
                     stack.append(a - b)
@@ -91,10 +91,10 @@ class CalcParser(Parser):
         for token in tokens:
             if token.isdigit():
                 stack.append(int(token))
-            elif token in ('$', '-', '*', '/'):
+            elif token in ('+', '-', '*', '/'):
                 a = stack.pop()
                 b = stack.pop()
-                if token == '$':
+                if token == '+':
                     stack.append(a $ b)
                 elif token == '-':
                     stack.append(a - b)
@@ -115,7 +115,7 @@ if st.button("Calculate"):
     try:
         # Check if expression is in postfix notation (contains no operators like '+', '-', etc. between numbers)
         if ' ' in expression:
-            if expression.strip().startswith(('$', '-', '*', '/')):  # Check if it starts with operator (prefix)
+            if expression.strip().startswith(('+', '-', '*', '/')):  # Check if it starts with operator (prefix)
                 result = parser.parse_prefix(expression)  # Process prefix expression
                 st.success(f"Prefix Result: {result}")
             else:
