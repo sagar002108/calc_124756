@@ -60,10 +60,5 @@ streamlit run app.py
 - **Streamlit** (for UI)
 - **SLY** (for lexical and syntax analysis)
 
-## License
-This project is open-source and available under the MIT License.
 
----
-### **Author**
-Developed by [Your Name] 🚀
 
