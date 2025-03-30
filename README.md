@@ -1,35 +1,69 @@
-calc_124756
+# Streamlit Calculator
 
-Overview
+## Overview
+This is a simple yet powerful calculator built using Streamlit and SLY (Simple Lex-Yacc). The calculator supports:
 
-calc_124756 is a Python-based calculator app built using Streamlit. It supports various types of mathematical operations, including basic arithmetic operations like addition, subtraction, multiplication, and division. The calculator also handles different mathematical notations, such as prefix, infix, and postfix expressions.
+1. **Basic Arithmetic Operations** (Addition, Subtraction, Multiplication, Division)
+2. **Infix Notation** (Standard mathematical expressions like `3 + 4 * 5`)
+3. **Postfix Notation** (Reverse Polish Notation, e.g., `3 4 5 * +`)
+4. **Prefix Notation** (Polish Notation, e.g., `+ 3 * 4 5`)
 
-Features:
-Prefix, Infix, and Postfix Notation Support: Evaluate expressions written in any of these notations.
-Basic Arithmetic Operations: Addition, Subtraction, Multiplication, Division.
-Streamlit Interface: A user-friendly web interface for easy interaction.
-Installation
+## Features
+- Accepts mathematical expressions in **infix, prefix, and postfix notations**.
+- Automatically detects the notation based on input format.
+- Uses **SLY (Simple Lex-Yacc)** for lexical and syntax analysis.
+- Implements a **stack-based approach** for evaluating prefix and postfix expressions.
+- Provides a **user-friendly interface** using Streamlit.
 
-Clone the repository:
-git clone https://github.com/sagar002108/calc_124756.git
-Navigate into the project directory:
-cd calc_124756
-Install the required dependencies:
-pip install -r requirements.txt
-Usage
+## Installation
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-repo/streamlit-calculator.git
+   cd streamlit-calculator
+   ```
+2. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-To run the calculator, use the following command:
-streamlit run streamlit_calculator.py
-The app will launch in your default browser, and you can begin interacting with the calculator.
-Features and Examples:
+## Usage
+Run the Streamlit application using:
+```sh
+streamlit run app.py
+```
 
-Prefix Notation:
-Example: + 3 * 4 5 → This evaluates as 3 + (4 * 5) = 23.
-Postfix Notation:
-Example: 3 4 5 * + → This evaluates as 3 + (4 * 5) = 23.
-Infix Notation:
-Example: 3 + 4 * 5 → This evaluates as 3 + (4 * 5) = 23.
-Streamlit Interface:
-Once the app is running, users can input mathematical expressions directly into a text box. The app will evaluate the expressions and display the result in real-time.
+## How It Works
+1. **Basic Calculator:**
+   - Enter expressions like `3 + 5`, `10 - 2`, `6 * 7`, `8 / 2`.
+   - Click "Calculate" to see the result.
 
+2. **Infix Notation:**
+   - Example: `3 + 4 * 5` (evaluates as `3 + (4 * 5) = 23`).
+
+3. **Postfix Notation:**
+   - Example: `3 4 5 * +` (evaluates as `3 + (4 * 5) = 23`).
+   - Uses a stack to process operands and operators.
+
+4. **Prefix Notation:**
+   - Example: `+ 3 * 4 5` (evaluates as `3 + (4 * 5) = 23`).
+   - Uses a reversed stack processing method.
+
+## Example Calculations
+| Notation  | Expression    | Evaluates To |
+|-----------|--------------|--------------|
+| Infix     | `3 + 4 * 5`  | `23`         |
+| Postfix   | `3 4 5 * +`  | `23`         |
+| Prefix    | `+ 3 * 4 5`  | `23`         |
+
+## Technologies Used
+- **Python**
+- **Streamlit** (for UI)
+- **SLY** (for lexical and syntax analysis)
+
+## License
+This project is open-source and available under the MIT License.
+
+---
+### **Author**
+Developed by [Your Name] 🚀
 
