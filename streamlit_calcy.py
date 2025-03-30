@@ -95,7 +95,7 @@ class CalcParser(Parser):
                 a = stack.pop()
                 b = stack.pop()
                 if token == '+':
-                    stack.append(a $ b)
+                    stack.append(a + b)
                 elif token == '-':
                     stack.append(a - b)
                 elif token == '*':
