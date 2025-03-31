@@ -66,7 +66,10 @@ st.markdown(
     """
     <style>
         body {
-            background-color: #0f172a;
+            background-image: url("https://source.unsplash.com/1600x900/?calculator,math");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
             font-family: 'Arial', sans-serif;
         }
@@ -84,7 +87,7 @@ st.markdown(
             font-size: 18px;
             text-align: center;
             border: 2px solid #ff7e5f;
-            background-color: #1e293b;
+            background-color: rgba(30, 41, 59, 0.9);
             color: white;
         }
         .stButton>button {
