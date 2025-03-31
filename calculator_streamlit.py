@@ -7,7 +7,7 @@ class CalcLexer(Lexer):
     ignore = ' \t'
 
     # Token definitions
-    NUMBER = r'-?\d+'
+    NUMBER = r'-?\d+'  # Allow negative numbers
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -28,6 +28,7 @@ class CalcParser(Parser):
         ('right', 'UMINUS')
     )
 
+    # Define grammar rules
     @_('expr')
     def statement(self, p):
         return p.expr
@@ -36,7 +37,7 @@ class CalcParser(Parser):
     def statement(self, p):
         return None  # Handles empty input
     
-    # Handling operators
+    # Infix operations
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -71,7 +72,7 @@ class CalcParser(Parser):
         tokens = expr.split()
         
         for token in tokens:
-            if token.isdigit():
+            if token.isdigit() or (token[0] == '-' and token[1:].isdigit()):  # Allow negative numbers
                 stack.append(int(token))
             elif token in ('+', '-', '*', '/'):
                 if len(stack) < 2:
@@ -94,7 +95,7 @@ class CalcParser(Parser):
         tokens = expr.split()[::-1]  # Reverse for prefix notation
         
         for token in tokens:
-            if token.isdigit():
+            if token.isdigit() or (token[0] == '-' and token[1:].isdigit()):
                 stack.append(int(token))
             elif token in ('+', '-', '*', '/'):
                 if len(stack) < 2:
@@ -111,6 +112,21 @@ class CalcParser(Parser):
                     stack.append(a / b if b != 0 else "Error: Division by zero")
         return stack[0] if stack else "Error: Invalid Expression"
 
+    # Simple Calculator for two numbers
+    def simple_calculator(self, num1, num2, operation):
+        try:
+            num1, num2 = float(num1), float(num2)
+            if operation == '+':
+                return num1 + num2
+            elif operation == '-':
+                return num1 - num2
+            elif operation == '*':
+                return num1 * num2
+            elif operation == '/':
+                return num1 / num2 if num2 != 0 else "Error: Division by zero"
+        except ValueError:
+            return "Error: Invalid Input"
+
 # Streamlit UI Setup
 st.title("🧮  Professional Multi-Mode Calculator")
 
@@ -121,9 +137,9 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # Dropdown to select mode
-calc_mode = st.selectbox("Select Calculation Mode", ["Infix Notation", "Prefix Notation", "Postfix Notation"])
+calc_mode = st.selectbox("Select Calculation Mode", ["Simple Calculator", "Infix Notation", "Prefix Notation", "Postfix Notation"])
 
-# Layout: Calculator Buttons
+# Layout: Calculator Buttons for Simple Calculator
 buttons = [
     ["7", "8", "9", "/"],
     ["4", "5", "6", "*"],
@@ -136,7 +152,7 @@ col1, col2 = st.columns([2, 1])
 with col1:
     st.text_input("Expression:", value=st.session_state.input_text, key="display", disabled=True)
 
-    # Button grid
+    # Button grid for the Simple Calculator
     for row in buttons:
         cols = st.columns(4)
         for i, label in enumerate(row):
@@ -166,7 +182,7 @@ with col2:
         st.write(entry)
 
 # Mode-Specific Calculation
-if calc_mode != "Infix Notation":
+if calc_mode != "Simple Calculator":
     expression = st.text_input(f"Enter {calc_mode} Expression:")
 
     if st.button(f"Calculate {calc_mode}"):
@@ -178,5 +194,10 @@ if calc_mode != "Infix Notation":
             elif calc_mode == "Prefix Notation":
                 result = parser.parse_prefix(expression)
                 st.success(f"Prefix Result: {result}")
+            elif calc_mode == "Infix Notation":
+                lexer = CalcLexer()
+                tokens = iter(lexer.tokenize(expression))
+                result = parser.parse(tokens)
+                st.success(f"Infix Result: {result}")
         except Exception as e:
             st.error(f"Error: {e}")
