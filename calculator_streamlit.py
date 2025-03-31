@@ -37,7 +37,6 @@ class CalcParser(Parser):
     def statement(self, p):
         return None  # Handles empty input
     
-    # Handling infix notation and precedence
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
