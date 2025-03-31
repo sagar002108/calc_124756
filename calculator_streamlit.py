@@ -6,7 +6,8 @@ class CalcLexer(Lexer):
     tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
     ignore = ' \t'
 
-    NUMBER = r'-?\d+'  # Allow negative numbers
+    # Support negative numbers
+    NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -21,17 +22,21 @@ class CalcLexer(Lexer):
 # Parser (Syntax Analysis)
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
-
+    
     precedence = (
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
-        ('right', 'UMINUS')  # Handle negative numbers
+        ('right', 'UMINUS'),
     )
 
     @_('expr')
     def statement(self, p):
         return p.expr
-
+    
+    @_('')
+    def statement(self, p):
+        return None  # Handles empty input
+    
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -51,7 +56,7 @@ class CalcParser(Parser):
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
         return -p.expr
-    
+
     @_('LPAREN expr RPAREN')
     def expr(self, p):
         return p.expr
@@ -60,85 +65,103 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.NUMBER
 
-# Streamlit UI
-st.set_page_config(page_title="Calculator", page_icon="🧮", layout="centered")
+    # Postfix Expression Handling
+    def parse_postfix(self, expr):
+        stack = []
+        tokens = expr.split()
 
-st.markdown(
-    """
-    <style>
-        .calculator {
-            display: grid;
-            grid-template-columns: repeat(4, 80px);
-            gap: 10px;
-            justify-content: center;
-        }
-        .button {
-            width: 80px;
-            height: 80px;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 10px;
-            border: none;
-            background-color: #f1f1f1;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .button:hover {
-            background-color: #ddd;
-        }
-        .display {
-            width: 340px;
-            height: 80px;
-            text-align: right;
-            font-size: 32px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #ccc;
-            background-color: #fff;
-            margin-bottom: 10px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+        for token in tokens:
+            if token.lstrip('-').isdigit():  # Handles negative numbers
+                stack.append(int(token))
+            elif token in ('+', '-', '*', '/'):
+                if len(stack) < 2:
+                    return "Error: Invalid Expression"
+                b = stack.pop()
+                a = stack.pop()
+                if token == '+':
+                    stack.append(a + b)
+                elif token == '-':
+                    stack.append(a - b)
+                elif token == '*':
+                    stack.append(a * b)
+                elif token == '/':
+                    stack.append(a / b if b != 0 else "Error: Division by zero")
+        return stack[0] if stack else "Error: Invalid Expression"
 
-st.markdown("<h1 style='text-align: center;'>🧮 Calculator</h1>", unsafe_allow_html=True)
+    # Prefix Expression Handling
+    def parse_prefix(self, expr):
+        stack = []
+        tokens = expr.split()[::-1]  # Reverse the tokens for prefix processing
 
-# Store the calculator input
-if "expression" not in st.session_state:
-    st.session_state.expression = ""
+        for token in tokens:
+            if token.lstrip('-').isdigit():  # Handles negative numbers
+                stack.append(int(token))
+            elif token in ('+', '-', '*', '/'):
+                if len(stack) < 2:
+                    return "Error: Invalid Expression"
+                a = stack.pop()
+                b = stack.pop()
+                if token == '+':
+                    stack.append(a + b)
+                elif token == '-':
+                    stack.append(a - b)
+                elif token == '*':
+                    stack.append(a * b)
+                elif token == '/':
+                    stack.append(a / b if b != 0 else "Error: Division by zero")
+        return stack[0] if stack else "Error: Invalid Expression"
 
-# Display Screen
-st.markdown(f"<div class='display'>{st.session_state.expression}</div>", unsafe_allow_html=True)
-
-# Buttons for the calculator
-buttons = [
-    "7", "8", "9", "/",
-    "4", "5", "6", "*",
-    "1", "2", "3", "-",
-    "0", "C", "=", "+"
-]
-
-# Define button click event
-def button_click(btn):
-    if btn == "C":
-        st.session_state.expression = ""  # Clear input
-    elif btn == "=":
+    # Simple Calculator for Two Numbers
+    def simple_calculator(self, num1, num2, operation):
         try:
-            lexer = CalcLexer()
-            tokens = list(lexer.tokenize(st.session_state.expression))
-            parser = CalcParser()
-            result = parser.parse(iter(tokens))
-            st.session_state.expression = str(result)
-        except Exception:
-            st.session_state.expression = "Error"
-    else:
-        st.session_state.expression += btn  # Append button value
+            num1, num2 = float(num1), float(num2)
+            if operation == '+':
+                return num1 + num2
+            elif operation == '-':
+                return num1 - num2
+            elif operation == '*':
+                return num1 * num2
+            elif operation == '/':
+                return num1 / num2 if num2 != 0 else "Error: Division by zero"
+        except ValueError:
+            return "Error: Invalid Input"
 
-# Display Buttons in Grid
-cols = st.columns(4)
-for index, btn in enumerate(buttons):
-    with cols[index % 4]:
-        st.button(btn, key=btn, on_click=button_click, args=(btn,))
+# Streamlit UI
+st.title("🧮  Multi-Mode Calculator")
+
+# Dropdown to select mode
+calc_mode = st.selectbox("Select Calculation Mode", ["Simple Calculator", "Infix Notation", "Prefix Notation", "Postfix Notation"])
+
+# UI based on mode
+parser = CalcParser()
+
+if calc_mode == "Simple Calculator":
+    num1 = st.text_input("Enter first number:")
+    num2 = st.text_input("Enter second number:")
+    operation = st.selectbox("Select operation", ["+", "-", "*", "/"])
+    
+    if st.button("Calculate"):
+        result = parser.simple_calculator(num1, num2, operation)
+        st.success(f"Result: {result}")
+
+else:
+    expression = st.text_input("Enter Expression:")
+
+    if st.button("Calculate"):
+        try:
+            if calc_mode == "Infix Notation":
+                lexer = CalcLexer()
+                tokens = iter(lexer.tokenize(expression))
+                result = parser.parse(tokens)
+                st.success(f"Infix Result: {result}")
+
+            elif calc_mode == "Postfix Notation":
+                result = parser.parse_postfix(expression)
+                st.success(f"Postfix Result: {result}")
+
+            elif calc_mode == "Prefix Notation":
+                result = parser.parse_prefix(expression)
+                st.success(f"Prefix Result: {result}")
+
+        except Exception as e:
+            st.error(f"Error: {e}")
