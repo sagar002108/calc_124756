@@ -66,15 +66,15 @@ st.markdown(
     """
     <style>
         body {
-            background-image: url("https://source.unsplash.com/1600x900/?calculator,technology");
+            background-image: url("https://png.pngtree.com/thumb_back/fh260/background/20200703/pngtree-mathematics-education-calculator-ruler-hand-drawn-background-image_340649.jpg");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: white;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Arial', sans-serif;
         }
         .overlay {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             position: absolute;
             top: 0;
             left: 0;
@@ -83,45 +83,44 @@ st.markdown(
         }
         .main-title {
             text-align: center;
-            font-size: 48px;
+            font-size: 42px;
             font-weight: bold;
-            background: linear-gradient(90deg, #4f92d1, #2b6b8c);
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-            margin-top: 50px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .stTextInput>div>div>input {
             border-radius: 12px;
             padding: 14px;
-            font-size: 22px;
+            font-size: 20px;
             text-align: center;
-            border: 2px solid #4f92d1;
-            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid #ff7e5f;
+            background-color: rgba(255, 255, 255, 0.9);
             color: black;
         }
         .stButton>button {
-            background: linear-gradient(90deg, #4f92d1, #2b6b8c);
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             border-radius: 14px;
-            padding: 16px 32px;
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+            padding: 14px 28px;
+            box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
             transition: 0.3s;
         }
         .stButton>button:hover {
-            background: linear-gradient(90deg, #2b6b8c, #4f92d1);
-            transform: scale(1.05);
+            background: linear-gradient(90deg, #feb47b, #ff7e5f);
+            transform: scale(1.08);
         }
         .result-box {
             text-align: center;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
             color: #34eb8c;
-            padding: 12px;
-            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
             border-radius: 12px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
     </style>
     """,
