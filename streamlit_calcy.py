@@ -7,7 +7,7 @@ class CalcLexer(Lexer):
     ignore = ' \t'
 
     # Support negative numbers
-    NUMBER = r'-?\d+'  
+    NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -16,17 +16,17 @@ class CalcLexer(Lexer):
     RPAREN = r'\)'
 
     def NUMBER(self, t):
-        t.value = int(t.value)  # Convert to integer
+        t.value = int(t.value)
         return t
 
-# Parser (Syntax Analysis)
+# Parser (Syntax Analysis) supporting both Prefix and Infix Notation
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
     precedence = (
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
-        ('right', 'UMINUS'),  # Handle unary minus
+        ('right', 'UMINUS'),
     )
 
     @_('expr')
@@ -35,8 +35,9 @@ class CalcParser(Parser):
 
     @_('')
     def statement(self, p):
-        return None  # Handles empty input
+        return None
 
+    # Infix notation (4 + 6)
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -55,7 +56,7 @@ class CalcParser(Parser):
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        return -p.expr  # Handle negative numbers
+        return -p.expr
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
@@ -65,78 +66,29 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.NUMBER
 
+    # Prefix notation (+ 4 6 → 4 + 6)
+    @_('PLUS expr expr')
+    def expr(self, p):
+        return p.expr0 + p.expr1
+
+    @_('MINUS expr expr')
+    def expr(self, p):
+        return p.expr0 - p.expr1
+
+    @_('TIMES expr expr')
+    def expr(self, p):
+        return p.expr0 * p.expr1
+
+    @_('DIVIDE expr expr')
+    def expr(self, p):
+        return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
+
 # Streamlit UI
 st.set_page_config(page_title="PPI Calculator", page_icon="🧮", layout="centered")
 
-st.markdown(
-    """
-    <style>
-        body {
-            background-image: url("https://png.pngtree.com/thumb_back/fh260/background/20200703/pngtree-mathematics-education-calculator-ruler-hand-drawn-background-image_340649.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white;
-            font-family: 'Arial', sans-serif;
-        }
-        .overlay {
-            background: rgba(0, 0, 0, 0.6);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .main-title {
-            text-align: center;
-            font-size: 42px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .stTextInput>div>div>input {
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 20px;
-            text-align: center;
-            border: 2px solid #ff7e5f;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: black;
-        }
-        .stButton>button {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
-            color: white;
-            font-size: 22px;
-            border-radius: 14px;
-            padding: 14px 28px;
-            box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
-            transition: 0.3s;
-        }
-        .stButton>button:hover {
-            background: linear-gradient(90deg, #feb47b, #ff7e5f);
-            transform: scale(1.08);
-        }
-        .result-box {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #34eb8c;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 12px;
-            margin-top: 20px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("<h1 style='text-align: center;'>🧮 PPI Calculator</h1>", unsafe_allow_html=True)
 
-st.markdown("<div class='overlay'></div>", unsafe_allow_html=True)
-st.markdown("<h1 class='main-title'>🧮 PPI Calculator</h1>", unsafe_allow_html=True)
-
-expression = st.text_input("Enter Expression:", placeholder="Type your math expression here...")
+expression = st.text_input("Enter Expression:", placeholder="e.g., 3 + 5 * (2 - 1) or + 4 6")
 
 if st.button("Calculate 🧮"):
     lexer = CalcLexer()
@@ -145,6 +97,6 @@ if st.button("Calculate 🧮"):
     try:
         tokens = iter(lexer.tokenize(expression))
         result = parser.parse(tokens)
-        st.markdown(f"<div class='result-box'>✅ Result: {result}</div>", unsafe_allow_html=True)
+        st.success(f"✅ Result: {result}")
     except Exception as e:
         st.error(f"❌ Error: {e}")
