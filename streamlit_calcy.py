@@ -66,54 +66,68 @@ st.markdown(
     """
     <style>
         body {
-            background-image: url("https://source.unsplash.com/1600x900/?calculator,math");
+            background-image: url("https://source.unsplash.com/1600x900/?calculator,digital");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: white;
             font-family: 'Arial', sans-serif;
         }
+        .overlay {
+            background: rgba(0, 0, 0, 0.6);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
         .main-title {
             text-align: center;
-            font-size: 36px;
+            font-size: 42px;
             font-weight: bold;
             background: linear-gradient(90deg, #ff7e5f, #feb47b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .stTextInput>div>div>input {
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 18px;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 20px;
             text-align: center;
             border: 2px solid #ff7e5f;
-            background-color: rgba(30, 41, 59, 0.9);
-            color: white;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: black;
         }
         .stButton>button {
             background: linear-gradient(90deg, #ff7e5f, #feb47b);
             color: white;
-            font-size: 20px;
-            border-radius: 12px;
-            padding: 12px 24px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 22px;
+            border-radius: 14px;
+            padding: 14px 28px;
+            box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
             transition: 0.3s;
         }
         .stButton>button:hover {
             background: linear-gradient(90deg, #feb47b, #ff7e5f);
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
         .result-box {
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             color: #34eb8c;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            margin-top: 20px;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+st.markdown("<div class='overlay'></div>", unsafe_allow_html=True)
 st.markdown("<h1 class='main-title'>🧮 PPI Calculator</h1>", unsafe_allow_html=True)
 
 expression = st.text_input("Enter Expression:", placeholder="Type your math expression here...")
