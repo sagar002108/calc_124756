@@ -6,7 +6,6 @@ class CalcLexer(Lexer):
     tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
     ignore = ' \t'
 
-    # Support negative numbers
     NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
@@ -22,12 +21,7 @@ class CalcLexer(Lexer):
 # Parser (Syntax Analysis)
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
-    
-    precedence = (
-        ('left', PLUS, MINUS),
-        ('left', TIMES, DIVIDE),
-        ('right', 'UMINUS'),
-    )
+    precedence = (('left', PLUS, MINUS), ('left', TIMES, DIVIDE), ('right', 'UMINUS'))
 
     @_('expr')
     def statement(self, p):
@@ -35,8 +29,8 @@ class CalcParser(Parser):
     
     @_('')
     def statement(self, p):
-        return None  # Handles empty input
-    
+        return None  
+
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -65,103 +59,53 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.NUMBER
 
-    # Postfix Expression Handling
-    def parse_postfix(self, expr):
-        stack = []
-        tokens = expr.split()
+# Streamlit UI Setup
+st.title("🧮  Professional Multi-Mode Calculator")
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():  # Handles negative numbers
-                stack.append(int(token))
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                b = stack.pop()
-                a = stack.pop()
-                if token == '+':
-                    stack.append(a + b)
-                elif token == '-':
-                    stack.append(a - b)
-                elif token == '*':
-                    stack.append(a * b)
-                elif token == '/':
-                    stack.append(a / b if b != 0 else "Error: Division by zero")
-        return stack[0] if stack else "Error: Invalid Expression"
+# Session state to store input
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-    # Prefix Expression Handling
-    def parse_prefix(self, expr):
-        stack = []
-        tokens = expr.split()[::-1]  # Reverse the tokens for prefix processing
+# Layout: Calculator Buttons
+buttons = [
+    ["7", "8", "9", "/"],
+    ["4", "5", "6", "*"],
+    ["1", "2", "3", "-"],
+    ["0", "(", ")", "+"]
+]
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():  # Handles negative numbers
-                stack.append(int(token))
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                a = stack.pop()
-                b = stack.pop()
-                if token == '+':
-                    stack.append(a + b)
-                elif token == '-':
-                    stack.append(a - b)
-                elif token == '*':
-                    stack.append(a * b)
-                elif token == '/':
-                    stack.append(a / b if b != 0 else "Error: Division by zero")
-        return stack[0] if stack else "Error: Invalid Expression"
+col1, col2 = st.columns([2, 1])
 
-    # Simple Calculator for Two Numbers
-    def simple_calculator(self, num1, num2, operation):
+with col1:
+    st.text_input("Expression:", value=st.session_state.input_text, key="display", disabled=True)
+
+    # Button grid
+    for row in buttons:
+        cols = st.columns(4)
+        for i, label in enumerate(row):
+            if cols[i].button(label):
+                st.session_state.input_text += label
+
+    # Extra functions
+    cols = st.columns(4)
+    if cols[0].button("C"):
+        st.session_state.input_text = ""
+    if cols[1].button("←"):
+        st.session_state.input_text = st.session_state.input_text[:-1]
+    if cols[2].button("="):
         try:
-            num1, num2 = float(num1), float(num2)
-            if operation == '+':
-                return num1 + num2
-            elif operation == '-':
-                return num1 - num2
-            elif operation == '*':
-                return num1 * num2
-            elif operation == '/':
-                return num1 / num2 if num2 != 0 else "Error: Division by zero"
-        except ValueError:
-            return "Error: Invalid Input"
+            lexer = CalcLexer()
+            tokens = iter(lexer.tokenize(st.session_state.input_text))
+            parser = CalcParser()
+            result = parser.parse(tokens)
+            st.session_state.history.append(f"{st.session_state.input_text} = {result}")
+            st.session_state.input_text = str(result)
+        except Exception:
+            st.session_state.input_text = "Error"
 
-# Streamlit UI
-st.title("🧮  Multi-Mode Calculator")
-
-# Dropdown to select mode
-calc_mode = st.selectbox("Select Calculation Mode", ["Simple Calculator", "Infix Notation", "Prefix Notation", "Postfix Notation"])
-
-# UI based on mode
-parser = CalcParser()
-
-if calc_mode == "Simple Calculator":
-    num1 = st.text_input("Enter first number:")
-    num2 = st.text_input("Enter second number:")
-    operation = st.selectbox("Select operation", ["+", "-", "*", "/"])
-    
-    if st.button("Calculate"):
-        result = parser.simple_calculator(num1, num2, operation)
-        st.success(f"Result: {result}")
-
-else:
-    expression = st.text_input("Enter Expression:")
-
-    if st.button("Calculate"):
-        try:
-            if calc_mode == "Infix Notation":
-                lexer = CalcLexer()
-                tokens = iter(lexer.tokenize(expression))
-                result = parser.parse(tokens)
-                st.success(f"Infix Result: {result}")
-
-            elif calc_mode == "Postfix Notation":
-                result = parser.parse_postfix(expression)
-                st.success(f"Postfix Result: {result}")
-
-            elif calc_mode == "Prefix Notation":
-                result = parser.parse_prefix(expression)
-                st.success(f"Prefix Result: {result}")
-
-        except Exception as e:
-            st.error(f"Error: {e}")
+with col2:
+    st.write("### History")
+    for entry in st.session_state.history[-5:]:  
+        st.write(entry)
