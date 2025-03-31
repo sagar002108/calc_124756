@@ -71,10 +71,10 @@ st.markdown(
             background-position: center;
             background-attachment: fixed;
             color: white;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
         .overlay {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.4);
             position: absolute;
             top: 0;
             left: 0;
@@ -85,10 +85,10 @@ st.markdown(
             text-align: center;
             font-size: 48px;
             font-weight: bold;
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            background: linear-gradient(90deg, #4f92d1, #2b6b8c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
             margin-top: 50px;
         }
         .stTextInput>div>div>input {
@@ -96,21 +96,21 @@ st.markdown(
             padding: 14px;
             font-size: 22px;
             text-align: center;
-            border: 2px solid #ff7e5f;
+            border: 2px solid #4f92d1;
             background-color: rgba(255, 255, 255, 0.8);
             color: black;
         }
         .stButton>button {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            background: linear-gradient(90deg, #4f92d1, #2b6b8c);
             color: white;
             font-size: 24px;
             border-radius: 14px;
             padding: 16px 32px;
-            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
             transition: 0.3s;
         }
         .stButton>button:hover {
-            background: linear-gradient(90deg, #feb47b, #ff7e5f);
+            background: linear-gradient(90deg, #2b6b8c, #4f92d1);
             transform: scale(1.05);
         }
         .result-box {
