@@ -76,6 +76,9 @@ The translation method follows these steps:
 | Basic    | `-5 + 3`    | `-2` |
 | Basic    | `10 / -2`   | `-5` |
 
+##Outputs
+
+
 ## Installation
 1. Clone the repository:
    ```sh
