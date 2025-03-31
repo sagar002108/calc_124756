@@ -19,7 +19,7 @@ class CalcLexer(Lexer):
         t.value = int(t.value)
         return t
 
-# Parser (Syntax Analysis) supporting both Prefix and Infix Notation
+# Parser (Syntax Analysis) supporting Prefix and Infix Notation
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
@@ -66,7 +66,7 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.NUMBER
 
-    # Prefix notation (+ 4 6 → 4 + 6)
+    # Prefix notation support (+ 4 6 → 4 + 6)
     @_('PLUS expr expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -83,6 +83,23 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
 
+    # Handling single operators at start of input (+ 4 6)
+    @_('PLUS NUMBER NUMBER')
+    def expr(self, p):
+        return p.NUMBER0 + p.NUMBER1
+
+    @_('MINUS NUMBER NUMBER')
+    def expr(self, p):
+        return p.NUMBER0 - p.NUMBER1
+
+    @_('TIMES NUMBER NUMBER')
+    def expr(self, p):
+        return p.NUMBER0 * p.NUMBER1
+
+    @_('DIVIDE NUMBER NUMBER')
+    def expr(self, p):
+        return p.NUMBER0 / p.NUMBER1 if p.NUMBER1 != 0 else "Error: Division by zero"
+
 # Streamlit UI
 st.set_page_config(page_title="PPI Calculator", page_icon="🧮", layout="centered")
 
@@ -97,6 +114,9 @@ if st.button("Calculate 🧮"):
     try:
         tokens = iter(lexer.tokenize(expression))
         result = parser.parse(tokens)
-        st.success(f"✅ Result: {result}")
+        if result is not None:
+            st.success(f"✅ Result: {result}")
+        else:
+            st.error("❌ Invalid expression!")
     except Exception as e:
         st.error(f"❌ Error: {e}")
