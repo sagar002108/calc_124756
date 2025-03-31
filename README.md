@@ -92,7 +92,7 @@ The translation method follows these steps:
 ## Installation
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo/calculator.git
+   git clone https://github.com/sagar002108
    cd calculator
    ```
 2. Install dependencies:
