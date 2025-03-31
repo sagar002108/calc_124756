@@ -72,37 +72,37 @@ st.markdown(
     """
     <style>
     body {
-        background-color: #2E3440;
-        color: #D8DEE9;
-        font-family: Arial, sans-serif;
+        background-color: #F4F4F4;
+        color: #333333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .stApp {
-        background-color: #3B4252;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+        background-color: #FFFFFF;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
     .stTextInput>div>div>input {
-        font-size: 18px;
+        font-size: 20px;
         text-align: center;
-        background-color: #4C566A;
-        color: white;
-        border: 1px solid #81A1C1;
-        border-radius: 5px;
-        padding: 8px;
+        background-color: #E8E8E8;
+        color: #333333;
+        border: 2px solid #C1C1C1;
+        border-radius: 6px;
+        padding: 10px;
     }
     .stButton>button {
-        background-color: #5E81AC;
+        background-color: #4CAF50;
         color: white;
         font-size: 18px;
-        border-radius: 5px;
-        padding: 10px 20px;
+        border-radius: 6px;
+        padding: 12px 25px;
         border: none;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #88C0D0;
+        background-color: #45A049;
     }
     .stAlert {
         font-size: 18px;
