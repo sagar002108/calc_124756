@@ -34,6 +34,39 @@ This is a simple yet powerful calculator built using Streamlit and SLY (Simple L
 - Example: `+ 3 * 4 5` (evaluates as `3 + (4 * 5) = 23`).
 - Uses a reversed stack processing method.
 
+## Grammar of the Language
+The calculator application implements a custom grammar to parse and evaluate mathematical expressions. The grammar can be expressed in Backus-Naur Form (BNF) or Extended BNF (EBNF):
+```
+Expression  ::= Term ("+" | "-") Term)*
+Term        ::= Factor ("*" | "/") Factor)*
+Factor      ::= Number | "(" Expression ")"
+Number      ::= [0-9]+ ("." [0-9]+)?
+```
+This grammar supports basic arithmetic operations such as addition, subtraction, multiplication, and division, along with parentheses for operator precedence.
+
+## Type of the Parser
+The project employs a **Bottom-Up (LR) parser** using **SLY (Simple Lex-Yacc)**. The parser follows an LALR(1) parsing technique, which is commonly used for expression evaluation in programming languages. The lexer tokenizes input expressions, generating tokens like `NUMBER`, `PLUS`, `MINUS`, `MULTIPLY`, and `DIVIDE`, which are then processed by the parser.
+
+## Method of Translation and Integration of Parser and Translation
+The translation method follows these steps:
+
+1. **Lexical Analysis**:
+   - The lexer processes the input and converts it into a series of tokens.
+   - Example: Input `3 + 5` → Tokens: `NUMBER(3)`, `PLUS`, `NUMBER(5)`
+
+2. **Parsing**:
+   - The parser processes the tokenized input using LALR(1) parsing techniques.
+   - The grammar rules define how tokens are grouped into expressions.
+   - Example: `NUMBER(3) PLUS NUMBER(5)` → Expression → `Term + Term`
+
+3. **Semantic Actions and Translation**:
+   - The parser includes embedded actions to compute results.
+   - Example: `3 + 5` is parsed and then evaluated as `3 + 5 = 8`.
+
+4. **Integration with Streamlit**:
+   - The parsed and evaluated expressions are integrated into the Streamlit UI.
+   - Streamlit provides an interactive interface where users input expressions, which are then processed and displayed.
+
 ## Expected Outputs
 | Notation | Expression | Evaluates To |
 |----------|------------|-------------|
