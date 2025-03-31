@@ -66,7 +66,7 @@ st.markdown(
     """
     <style>
         body {
-            background-image: url("https://source.unsplash.com/1600x900/?calculator,digital");
+            background-image: url("https://source.unsplash.com/1600x900/?calculator,technology");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -83,44 +83,45 @@ st.markdown(
         }
         .main-title {
             text-align: center;
-            font-size: 42px;
+            font-size: 48px;
             font-weight: bold;
             background: linear-gradient(90deg, #ff7e5f, #feb47b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            margin-top: 50px;
         }
         .stTextInput>div>div>input {
             border-radius: 12px;
             padding: 14px;
-            font-size: 20px;
+            font-size: 22px;
             text-align: center;
             border: 2px solid #ff7e5f;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.8);
             color: black;
         }
         .stButton>button {
             background: linear-gradient(90deg, #ff7e5f, #feb47b);
             color: white;
-            font-size: 22px;
+            font-size: 24px;
             border-radius: 14px;
-            padding: 14px 28px;
-            box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
+            padding: 16px 32px;
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.3);
             transition: 0.3s;
         }
         .stButton>button:hover {
             background: linear-gradient(90deg, #feb47b, #ff7e5f);
-            transform: scale(1.08);
+            transform: scale(1.05);
         }
         .result-box {
             text-align: center;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             color: #34eb8c;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 12px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
     </style>
     """,
