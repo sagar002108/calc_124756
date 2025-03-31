@@ -6,6 +6,7 @@ class CalcLexer(Lexer):
     tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
     ignore = ' \t'
 
+    # Token definitions
     NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
@@ -21,7 +22,11 @@ class CalcLexer(Lexer):
 # Parser (Syntax Analysis)
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
-    precedence = (('left', PLUS, MINUS), ('left', TIMES, DIVIDE), ('right', 'UMINUS'))
+    precedence = (
+        ('left', PLUS, MINUS),
+        ('left', TIMES, DIVIDE),
+        ('right', 'UMINUS')
+    )
 
     @_('expr')
     def statement(self, p):
@@ -29,8 +34,9 @@ class CalcParser(Parser):
     
     @_('')
     def statement(self, p):
-        return None  
-
+        return None  # Handles empty input
+    
+    # Handling operators
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
@@ -50,7 +56,7 @@ class CalcParser(Parser):
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
         return -p.expr
-
+    
     @_('LPAREN expr RPAREN')
     def expr(self, p):
         return p.expr
@@ -58,6 +64,52 @@ class CalcParser(Parser):
     @_('NUMBER')
     def expr(self, p):
         return p.NUMBER
+
+    # Postfix Expression Handling
+    def parse_postfix(self, expr):
+        stack = []
+        tokens = expr.split()
+        
+        for token in tokens:
+            if token.isdigit():
+                stack.append(int(token))
+            elif token in ('+', '-', '*', '/'):
+                if len(stack) < 2:
+                    return "Error: Invalid Expression"
+                b = stack.pop()
+                a = stack.pop()
+                if token == '+':
+                    stack.append(a + b)
+                elif token == '-':
+                    stack.append(a - b)
+                elif token == '*':
+                    stack.append(a * b)
+                elif token == '/':
+                    stack.append(a / b if b != 0 else "Error: Division by zero")
+        return stack[0] if stack else "Error: Invalid Expression"
+
+    # Prefix Expression Handling
+    def parse_prefix(self, expr):
+        stack = []
+        tokens = expr.split()[::-1]  # Reverse for prefix notation
+        
+        for token in tokens:
+            if token.isdigit():
+                stack.append(int(token))
+            elif token in ('+', '-', '*', '/'):
+                if len(stack) < 2:
+                    return "Error: Invalid Expression"
+                a = stack.pop()
+                b = stack.pop()
+                if token == '+':
+                    stack.append(a + b)
+                elif token == '-':
+                    stack.append(a - b)
+                elif token == '*':
+                    stack.append(a * b)
+                elif token == '/':
+                    stack.append(a / b if b != 0 else "Error: Division by zero")
+        return stack[0] if stack else "Error: Invalid Expression"
 
 # Streamlit UI Setup
 st.title("🧮  Professional Multi-Mode Calculator")
@@ -67,6 +119,9 @@ if "input_text" not in st.session_state:
     st.session_state.input_text = ""
 if "history" not in st.session_state:
     st.session_state.history = []
+
+# Dropdown to select mode
+calc_mode = st.selectbox("Select Calculation Mode", ["Infix Notation", "Prefix Notation", "Postfix Notation"])
 
 # Layout: Calculator Buttons
 buttons = [
@@ -107,5 +162,21 @@ with col1:
 
 with col2:
     st.write("### History")
-    for entry in st.session_state.history[-5:]:  
+    for entry in st.session_state.history[-5:]:  # Show the last 5 results
         st.write(entry)
+
+# Mode-Specific Calculation
+if calc_mode != "Infix Notation":
+    expression = st.text_input(f"Enter {calc_mode} Expression:")
+
+    if st.button(f"Calculate {calc_mode}"):
+        try:
+            parser = CalcParser()
+            if calc_mode == "Postfix Notation":
+                result = parser.parse_postfix(expression)
+                st.success(f"Postfix Result: {result}")
+            elif calc_mode == "Prefix Notation":
+                result = parser.parse_prefix(expression)
+                st.success(f"Prefix Result: {result}")
+        except Exception as e:
+            st.error(f"Error: {e}")
