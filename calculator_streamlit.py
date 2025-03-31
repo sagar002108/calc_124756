@@ -1,4 +1,3 @@
-# %%
 import streamlit as st
 from sly import Lexer, Parser
 
@@ -7,8 +6,8 @@ class CalcLexer(Lexer):
     tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
     ignore = ' \t'
 
-    # Token definitions
-    NUMBER = r'\d+'
+    # Support negative numbers
+    NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -27,8 +26,9 @@ class CalcParser(Parser):
     precedence = (
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
+        ('right', 'UMINUS'),
     )
-    
+
     @_('expr')
     def statement(self, p):
         return p.expr
@@ -54,6 +54,10 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
     
+    @_('MINUS expr %prec UMINUS')
+    def expr(self, p):
+        return -p.expr
+
     @_('LPAREN expr RPAREN')
     def expr(self, p):
         return p.expr
@@ -68,7 +72,7 @@ class CalcParser(Parser):
         tokens = expr.split()
 
         for token in tokens:
-            if token.isdigit():
+            if token.lstrip('-').isdigit():  # Handles negative numbers
                 stack.append(int(token))
             elif token in ('+', '-', '*', '/'):
                 if len(stack) < 2:
@@ -91,7 +95,7 @@ class CalcParser(Parser):
         tokens = expr.split()[::-1]  # Reverse the tokens for prefix processing
 
         for token in tokens:
-            if token.isdigit():
+            if token.lstrip('-').isdigit():  # Handles negative numbers
                 stack.append(int(token))
             elif token in ('+', '-', '*', '/'):
                 if len(stack) < 2:
@@ -162,6 +166,3 @@ else:
 
         except Exception as e:
             st.error(f"Error: {e}")
-
-
-
