@@ -6,7 +6,8 @@ class CalcLexer(Lexer):
     tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
     ignore = ' \t'
 
-    NUMBER = r'\d+'
+    # Support negative numbers
+    NUMBER = r'-?\d+'  
     PLUS = r'\+'
     MINUS = r'-'
     TIMES = r'\*'
@@ -15,46 +16,51 @@ class CalcLexer(Lexer):
     RPAREN = r'\)'
 
     def NUMBER(self, t):
-        t.value = int(t.value)
+        t.value = int(t.value)  # Convert to integer
         return t
 
 # Parser (Syntax Analysis)
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
-    
+
     precedence = (
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
+        ('right', 'UMINUS'),  # Handle unary minus
     )
-    
+
     @_('expr')
     def statement(self, p):
         return p.expr
-    
+
     @_('')
     def statement(self, p):
         return None  # Handles empty input
-    
+
     @_('expr PLUS expr')
     def expr(self, p):
         return p.expr0 + p.expr1
-    
+
     @_('expr MINUS expr')
     def expr(self, p):
         return p.expr0 - p.expr1
-    
+
     @_('expr TIMES expr')
     def expr(self, p):
         return p.expr0 * p.expr1
-    
+
     @_('expr DIVIDE expr')
     def expr(self, p):
         return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
-    
+
+    @_('MINUS expr %prec UMINUS')
+    def expr(self, p):
+        return -p.expr  # Handle negative numbers
+
     @_('LPAREN expr RPAREN')
     def expr(self, p):
         return p.expr
-    
+
     @_('NUMBER')
     def expr(self, p):
         return p.NUMBER
