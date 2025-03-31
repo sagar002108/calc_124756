@@ -77,6 +77,16 @@ The translation method follows these steps:
 | Basic    | `10 / -2`   | `-5` |
 
 ##Outputs
+![1](https://github.com/user-attachments/assets/ea9f563d-7081-4bb3-8ec0-37d31318eb05)
+![2](https://github.com/user-attachments/assets/aa0c370d-d5bc-4bc7-8336-6207cfa9ce71)
+![3](https://github.com/user-attachments/assets/69a4be99-d40d-4c41-b424-66e6505148f0)
+![4](https://github.com/user-attachments/assets/28a45d70-62a0-47ef-9f21-c7c89184c867)
+![5](https://github.com/user-attachments/assets/7f874496-4026-4704-9d35-52de9bd502e0)
+
+
+
+
+
 
 
 ## Installation
