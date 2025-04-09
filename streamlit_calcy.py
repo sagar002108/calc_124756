@@ -3,9 +3,14 @@ from sly import Lexer, Parser
 
 # Lexer
 class CalcLexer(Lexer):
-    tokens = {NUMBER, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN}
+    tokens = {
+        NUMBER, PLUS, MINUS, TIMES, DIVIDE,
+        LPAREN, RPAREN,
+        PLUS_WORD, MINUS_WORD, TIMES_WORD, DIVIDE_WORD
+    }
     ignore = ' \t'
 
+    # Symbol tokens
     NUMBER = r'-?\d+'
     PLUS = r'\+'
     MINUS = r'-'
@@ -14,11 +19,17 @@ class CalcLexer(Lexer):
     LPAREN = r'\('
     RPAREN = r'\)'
 
+    # Word-based prefix tokens
+    PLUS_WORD = r'plus'
+    MINUS_WORD = r'minus'
+    TIMES_WORD = r'times'
+    DIVIDE_WORD = r'divide'
+
     def NUMBER(self, t):
         t.value = int(t.value)
         return t
 
-# Parser
+# Evaluation Parser
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
@@ -50,7 +61,9 @@ class CalcParser(Parser):
 
     @_('expr DIVIDE expr')
     def expr(self, p):
-        return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
+        if p.expr1 == 0:
+            raise ZeroDivisionError("Division by zero")
+        return p.expr0 / p.expr1
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
@@ -64,138 +77,115 @@ class CalcParser(Parser):
     def expr(self, p):
         return p.NUMBER
 
-    # Postfix evaluation
-    def parse_postfix(self, expr):
-        stack = []
-        tokens = expr.split()
+    # Prefix symbol-based
+    @_('PLUS expr expr')
+    def expr(self, p):
+        return p.expr0 + p.expr1
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():
-                stack.append(int(token))
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                b = stack.pop()
-                a = stack.pop()
-                if token == '+':
-                    stack.append(a + b)
-                elif token == '-':
-                    stack.append(a - b)
-                elif token == '*':
-                    stack.append(a * b)
-                elif token == '/':
-                    stack.append(a / b if b != 0 else "Error: Division by zero")
-        return stack[0] if stack else "Error: Invalid Expression"
+    @_('MINUS expr expr')
+    def expr(self, p):
+        return p.expr0 - p.expr1
 
-    # Prefix evaluation
-    def parse_prefix(self, expr):
-        stack = []
-        tokens = expr.split()[::-1]
+    @_('TIMES expr expr')
+    def expr(self, p):
+        return p.expr0 * p.expr1
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():
-                stack.append(int(token))
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                a = stack.pop()
-                b = stack.pop()
-                if token == '+':
-                    stack.append(a + b)
-                elif token == '-':
-                    stack.append(a - b)
-                elif token == '*':
-                    stack.append(a * b)
-                elif token == '/':
-                    stack.append(a / b if b != 0 else "Error: Division by zero")
-        return stack[0] if stack else "Error: Invalid Expression"
+    @_('DIVIDE expr expr')
+    def expr(self, p):
+        if p.expr1 == 0:
+            raise ZeroDivisionError("Division by zero")
+        return p.expr0 / p.expr1
 
-    # Simple calculator
-    def simple_calculator(self, num1, num2, operation):
-        try:
-            num1, num2 = float(num1), float(num2)
-            if operation == '+':
-                return num1 + num2
-            elif operation == '-':
-                return num1 - num2
-            elif operation == '*':
-                return num1 * num2
-            elif operation == '/':
-                return num1 / num2 if num2 != 0 else "Error: Division by zero"
-        except ValueError:
-            return "Error: Invalid Input"
+    # Word-based prefix
+    @_('PLUS_WORD expr expr')
+    def expr(self, p):
+        return p.expr0 + p.expr1
 
-    # Prefix to readable infix
-    def prefix_to_infix(self, expr):
-        tokens = expr.split()[::-1]
-        stack = []
+    @_('MINUS_WORD expr expr')
+    def expr(self, p):
+        return p.expr0 - p.expr1
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():
-                stack.append(token)
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                a = stack.pop()
-                b = stack.pop()
-                stack.append(f"({a} {token} {b})")
-        return stack[0] if stack else "Error: Invalid Expression"
+    @_('TIMES_WORD expr expr')
+    def expr(self, p):
+        return p.expr0 * p.expr1
 
-    # Postfix to readable infix
-    def postfix_to_infix(self, expr):
-        tokens = expr.split()
-        stack = []
+    @_('DIVIDE_WORD expr expr')
+    def expr(self, p):
+        return p.expr0 / p.expr1 if p.expr1 != 0 else "Error: Division by zero"
 
-        for token in tokens:
-            if token.lstrip('-').isdigit():
-                stack.append(token)
-            elif token in ('+', '-', '*', '/'):
-                if len(stack) < 2:
-                    return "Error: Invalid Expression"
-                b = stack.pop()
-                a = stack.pop()
-                stack.append(f"({a} {token} {b})")
-        return stack[0] if stack else "Error: Invalid Expression"
+# Prefix to Infix String Parser
+class InfixBuilder(Parser):
+    tokens = CalcLexer.tokens
 
+    @_('expr')
+    def statement(self, p):
+        return p.expr
+
+    @_('NUMBER')
+    def expr(self, p):
+        return str(p.NUMBER)
+
+    @_('PLUS expr expr')
+    def expr(self, p):
+        return f"({p.expr0} + {p.expr1})"
+
+    @_('MINUS expr expr')
+    def expr(self, p):
+        return f"({p.expr0} - {p.expr1})"
+
+    @_('TIMES expr expr')
+    def expr(self, p):
+        return f"({p.expr0} * {p.expr1})"
+
+    @_('DIVIDE expr expr')
+    def expr(self, p):
+        return f"({p.expr0} / {p.expr1})"
+
+    @_('PLUS_WORD expr expr')
+    def expr(self, p):
+        return f"({p.expr0} + {p.expr1})"
+
+    @_('MINUS_WORD expr expr')
+    def expr(self, p):
+        return f"({p.expr0} - {p.expr1})"
+
+    @_('TIMES_WORD expr expr')
+    def expr(self, p):
+        return f"({p.expr0} * {p.expr1})"
+
+    @_('DIVIDE_WORD expr expr')
+    def expr(self, p):
+        return f"({p.expr0} / {p.expr1})"
 
 # Streamlit UI
-st.set_page_config(page_title="Calculator", layout="centered")
-st.title("🧮 Multi-Mode Calculator")
+st.set_page_config(page_title="Prefix to Infix Calculator", page_icon="🧮", layout="centered")
 
-calc_mode = st.selectbox("Select Calculation Mode", ["Simple Calculator", "Infix Notation", "Prefix Notation", "Postfix Notation"])
-parser = CalcParser()
+st.markdown("<h1 style='text-align: center;'>🧮 Prefix/Infix Calculator</h1>", unsafe_allow_html=True)
+st.markdown("Supports standard and prefix notation (e.g., `+ 3 5`, `* 2 + 1 3`) and shows equivalent infix expression.")
 
-if calc_mode == "Simple Calculator":
-    num1 = st.text_input("Enter first number:")
-    num2 = st.text_input("Enter second number:")
-    operation = st.selectbox("Select operation", ["+", "-", "*", "/"])
-    
-    if st.button("Calculate"):
-        result = parser.simple_calculator(num1, num2, operation)
-        st.success(f"Result: {result}")
+expression = st.text_input("Enter Expression:", placeholder="e.g., + 1 2 or * 1 + 2 3")
 
-else:
-    expression = st.text_input("Enter Expression:")
+if st.button("Calculate 🧮"):
+    if expression.strip() == "":
+        st.warning("⚠️ Please enter a valid expression.")
+    else:
+        lexer = CalcLexer()
+        evaluator = CalcParser()
+        infixifier = InfixBuilder()
 
-    if st.button("Calculate"):
         try:
-            if calc_mode == "Infix Notation":
-                lexer = CalcLexer()
-                tokens = iter(lexer.tokenize(expression))
-                result = parser.parse(tokens)
-                st.success(f"Infix Result: {result}")
+            tokens_for_eval = list(lexer.tokenize(expression))
+            tokens_for_infix = list(tokens_for_eval)  # Copy for reuse
 
-            elif calc_mode == "Prefix Notation":
-                result = parser.parse_prefix(expression)
-                readable = parser.prefix_to_infix(expression)
-                st.success(f"Prefix Result: {result}")
-                st.info(f"Readable Infix: {readable}")
+            # Evaluate result
+            result = evaluator.parse(iter(tokens_for_eval))
 
-            elif calc_mode == "Postfix Notation":
-                result = parser.parse_postfix(expression)
-                readable = parser.postfix_to_infix(expression)
-                st.success(f"Postfix Result: {result}")
-                st.info(f"Readable Infix: {readable}")
+            # Build infix expression
+            infix_expr = infixifier.parse(iter(tokens_for_infix))
 
+            st.success(f"✅ Result: {result}")
+            st.info(f"📝 Infix Expression: `{infix_expr}`")
+        except ZeroDivisionError as zde:
+            st.error(f"❌ Error: {zde}")
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"❌ Error: {e}")
